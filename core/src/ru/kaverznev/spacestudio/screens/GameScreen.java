@@ -14,6 +14,7 @@ import ru.kaverznev.spacestudio.objects.ShipObject;
 import ru.kaverznev.spacestudio.objects.TrashObject;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class GameScreen extends ScreenAdapter {
 
@@ -213,27 +214,34 @@ public class GameScreen extends ScreenAdapter {
     }
 
     private void updateTrash() {
-        for (int i = 0; i < trashArray.size(); i++) {
+        Iterator<TrashObject> iterator = trashArray.iterator();
 
-            boolean hasToBeDestroyed = !trashArray.get(i).isAlive() || !trashArray.get(i).isInFrame();
+        while (iterator.hasNext()) {                // использую итератор - 5 пункт ТЗ
+            TrashObject trash = iterator.next();
 
-            if (!trashArray.get(i).isAlive()) {
+            boolean hasToBeDestroyed = !trash.isAlive() || !trash.isInFrame();
+
+            if (!trash.isAlive()) {
                 gameSession.destructionRegistration();
                 if (myGdxGame.audioManager.isSoundOn) myGdxGame.audioManager.explosionSound.play(0.2f);
             }
 
             if (hasToBeDestroyed) {
-                myGdxGame.world.destroyBody(trashArray.get(i).body);
-                trashArray.remove(i--);
+                myGdxGame.world.destroyBody(trash.body);
+                iterator.remove();
             }
         }
     }
 
     private void updateBullets() {
-        for (int i = 0; i < bulletArray.size(); i++) {
-            if (bulletArray.get(i).hasToBeDestroyed()) {
-                myGdxGame.world.destroyBody(bulletArray.get(i).body);
-                bulletArray.remove(i--);
+        Iterator<BulletObject> iterator = bulletArray.iterator();
+
+        while (iterator.hasNext()) {
+            BulletObject bullet = iterator.next();
+
+            if (bullet.hasToBeDestroyed()) {
+                myGdxGame.world.destroyBody(bullet.body);
+                iterator.remove();
             }
         }
     }
