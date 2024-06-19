@@ -5,7 +5,6 @@ public class GameResources {
     // Images for textures
 
     public static final String BACKGROUND_IMG_PATH = "textures/background.png";
-
     public static final String BLACKOUT_FULL_IMG_PATH = "textures/blackout_full.png";
     public static final String BLACKOUT_TOP_IMG_PATH = "textures/blackout_top.png";
     public static final String BLACKOUT_MIDDLE_IMG_PATH = "textures/blackout_middle.png";
@@ -31,5 +30,11 @@ public class GameResources {
     // Fonts for text
 
     public static final String FONT_PATH = "fonts/Montserrat-Bold.ttf";
+
+
+
+    private static final String LASER_FOLDER = "textures/laser/";
+    public static final String LASER_ON = LASER_FOLDER + "laser_on.png";
+    public static final String LASER_DENGEROUS = LASER_FOLDER + "laser_dengerous.png";
 
 }

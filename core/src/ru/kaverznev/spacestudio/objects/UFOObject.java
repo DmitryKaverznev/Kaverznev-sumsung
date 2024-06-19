@@ -43,8 +43,7 @@ public class UFOObject extends GameObject {
 
 
     public void update() {
-        // Oscillate horizontally around the center with a controlled amplitude
-        float horizontalMovement = (float) Math.sin(getY() / 20) * 75;
+        float horizontalMovement = (float) Math.sin((double) getY() / 20) * 75;
         body.setLinearVelocity(new Vector2(horizontalMovement, -UFO_VELOCITY));
     }
 

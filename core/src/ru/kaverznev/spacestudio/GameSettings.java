@@ -13,6 +13,8 @@ public class GameSettings {
     public static final int VELOCITY_ITERATIONS = 6;
     public static final int POSITION_ITERATIONS = 6;
     public static final float SCALE = 0.05f;
+    public static final int LASER_WIDTH = 100;
+    public static final int LASER_HEIGHT = 100;
 
     public static float SHIP_FORCE_RATIO = 10;
     public static float TRASH_VELOCITY = 20;

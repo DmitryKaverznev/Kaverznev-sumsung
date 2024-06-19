@@ -5,18 +5,21 @@ import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ScreenUtils;
+
+
 import ru.kaverznev.spacestudio.*;
 import ru.kaverznev.spacestudio.components.*;
 import ru.kaverznev.spacestudio.managers.ContactManager;
 import ru.kaverznev.spacestudio.managers.MemoryManager;
 import ru.kaverznev.spacestudio.objects.BulletObject;
+import ru.kaverznev.spacestudio.objects.LaserObject;
 import ru.kaverznev.spacestudio.objects.ShipObject;
 import ru.kaverznev.spacestudio.objects.TrashObject;
 import ru.kaverznev.spacestudio.objects.UFOObject;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-
+import java.util.Objects;
 public class GameScreen extends ScreenAdapter {
 
     MyGdxGame myGdxGame;
@@ -27,6 +30,8 @@ public class GameScreen extends ScreenAdapter {
     ArrayList<BulletObject> bulletArray;
     ArrayList<UFOObject> UFOArray;
 
+    ArrayList<LaserObject> laserArray;
+
     ContactManager contactManager;
 
     // PLAY state UI
@@ -36,13 +41,14 @@ public class GameScreen extends ScreenAdapter {
     TextView scoreTextView;
     ButtonView pauseButton;
 
-    // PAUSED state UI
+
     ImageView fullBlackoutView;
     TextView pauseTextView;
     ButtonView homeButton;
     ButtonView continueButton;
 
-    // ENDED state UI
+    private float laserSpawnTime = 0f;
+
     TextView recordsTextView;
     RecordsListView recordsListView;
     ButtonView homeButton2;
@@ -56,6 +62,7 @@ public class GameScreen extends ScreenAdapter {
         trashArray = new ArrayList<>();
         UFOArray = new ArrayList<>();
         bulletArray = new ArrayList<>();
+        laserArray = new ArrayList<>();
 
         shipObject = new ShipObject(
                 GameSettings.SCREEN_WIDTH / 2, 150,
@@ -142,12 +149,11 @@ public class GameScreen extends ScreenAdapter {
 
             if (!shipObject.isAlive()) {
                 gameSession.endGame();
-                recordsListView.setRecords(MemoryManager.loadRecordsTable());
+                recordsListView.setRecords(Objects.requireNonNull(MemoryManager.loadRecordsTable()));
             }
 
             updateTrash();
             updateBullets();
-
 
             backgroundView.move();
             gameSession.updateScore();
@@ -211,6 +217,16 @@ public class GameScreen extends ScreenAdapter {
         liveView.draw(myGdxGame.batch);
         pauseButton.draw(myGdxGame.batch);
 
+        laserSpawnTime += Gdx.graphics.getDeltaTime();
+        float laserSpawnPeriod = 5f;
+        if (laserSpawnTime > laserSpawnPeriod) {
+            laserSpawnTime -= laserSpawnPeriod;
+            spawnLaser();
+            updateLaser();
+        }
+
+
+
         if (gameSession.state == GameState.PAUSED) {
             fullBlackoutView.draw(myGdxGame.batch);
             pauseTextView.draw(myGdxGame.batch);
@@ -265,6 +281,41 @@ public class GameScreen extends ScreenAdapter {
             }
 
             UFO.update();
+        }
+
+        Iterator<LaserObject> iteratorLaser = laserArray.iterator();
+        while (iteratorLaser.hasNext()) {
+            LaserObject laser = iteratorLaser.next();
+
+            if (laser.isCollidingWith(shipObject) && laser.LaserState == LaserObject.LaserStateMode.ON) {
+                shipObject.kill();
+                myGdxGame.world.destroyBody(laser.body);
+                iteratorLaser.remove();
+            }
+        }
+    }
+
+    private void spawnLaser() {
+        System.out.println("Spawn!");
+        LaserObject laserObject = new LaserObject(
+                myGdxGame.world
+        );
+        laserArray.add(laserObject);
+    }
+
+    private void updateLaser() {
+        Iterator<LaserObject> iterator = laserArray.iterator();
+        System.out.println("Update!");
+
+        while (iterator.hasNext()) {
+            LaserObject laser = iterator.next();
+
+            laser.update();
+
+            if (laser.LaserState == LaserObject.LaserStateMode.ON) {
+                myGdxGame.world.destroyBody(laser.body);
+                iterator.remove();
+            }
         }
     }
 
