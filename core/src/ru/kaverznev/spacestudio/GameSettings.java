@@ -30,6 +30,8 @@ public class GameSettings {
     public static final int SHIP_HEIGHT = 150;
     public static final int TRASH_WIDTH = 140;
     public static final int TRASH_HEIGHT = 100;
+    public static final int UFO_WIDTH = 70;
+    public static final int UFO_HEIGHT = 50;
     public static final int BULLET_WIDTH = 15;
     public static final int BULLET_HEIGHT = 45;
 

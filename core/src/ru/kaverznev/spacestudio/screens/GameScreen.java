@@ -12,9 +12,11 @@ import ru.kaverznev.spacestudio.managers.MemoryManager;
 import ru.kaverznev.spacestudio.objects.BulletObject;
 import ru.kaverznev.spacestudio.objects.ShipObject;
 import ru.kaverznev.spacestudio.objects.TrashObject;
+import ru.kaverznev.spacestudio.objects.UFOObject;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Objects;
 
 public class GameScreen extends ScreenAdapter {
 
@@ -24,6 +26,7 @@ public class GameScreen extends ScreenAdapter {
 
     ArrayList<TrashObject> trashArray;
     ArrayList<BulletObject> bulletArray;
+    ArrayList<UFOObject> UFOArray;
 
     ContactManager contactManager;
 
@@ -52,6 +55,7 @@ public class GameScreen extends ScreenAdapter {
         contactManager = new ContactManager(myGdxGame.world);
 
         trashArray = new ArrayList<>();
+        UFOArray = new ArrayList<>();
         bulletArray = new ArrayList<>();
 
         shipObject = new ShipObject(
@@ -117,7 +121,13 @@ public class GameScreen extends ScreenAdapter {
                         GameResources.TRASH_IMG_PATH,
                         myGdxGame.world
                 );
+                UFOObject ufoObject = new UFOObject(
+                        GameSettings.UFO_WIDTH, GameSettings.UFO_HEIGHT,
+                        GameResources.UFO_IMG_PATH,
+                        myGdxGame.world
+                );
                 trashArray.add(trashObject);
+                UFOArray.add(ufoObject);
             }
 
             if (shipObject.needToShoot()) {
@@ -138,6 +148,8 @@ public class GameScreen extends ScreenAdapter {
 
             updateTrash();
             updateBullets();
+
+
             backgroundView.move();
             gameSession.updateScore();
             scoreTextView.setText("Score: " + gameSession.getScore());
@@ -189,7 +201,10 @@ public class GameScreen extends ScreenAdapter {
 
         myGdxGame.batch.begin();
         backgroundView.draw(myGdxGame.batch);
+
         for (TrashObject trash : trashArray) trash.draw(myGdxGame.batch);
+        for (UFOObject UFO : UFOArray) UFO.draw(myGdxGame.batch);
+
         shipObject.draw(myGdxGame.batch);
         for (BulletObject bullet : bulletArray) bullet.draw(myGdxGame.batch);
         topBlackoutView.draw(myGdxGame.batch);
@@ -214,10 +229,9 @@ public class GameScreen extends ScreenAdapter {
     }
 
     private void updateTrash() {
-        Iterator<TrashObject> iterator = trashArray.iterator();
-
-        while (iterator.hasNext()) {                // использую итератор - 5 пункт ТЗ
-            TrashObject trash = iterator.next();
+        Iterator<TrashObject> iteratorTrash = trashArray.iterator();
+        while (iteratorTrash.hasNext()) {                // использую итератор - 5 пункт ТЗ
+            TrashObject trash = iteratorTrash.next();
 
             boolean hasToBeDestroyed = !trash.isAlive() || !trash.isInFrame();
 
@@ -228,8 +242,30 @@ public class GameScreen extends ScreenAdapter {
 
             if (hasToBeDestroyed) {
                 myGdxGame.world.destroyBody(trash.body);
-                iterator.remove();
+                iteratorTrash.remove();
             }
+        }
+
+
+
+        Iterator<UFOObject> iteratorUFO = UFOArray.iterator();
+        while (iteratorUFO.hasNext()) {
+            UFOObject UFO = iteratorUFO.next();
+
+            boolean hasToBeDestroyed = !UFO.isAlive() || !UFO.isInFrame();
+
+            if (!UFO.isAlive()) {
+                gameSession.destructionRegistration();
+                if (myGdxGame.audioManager.isSoundOn)
+                    myGdxGame.audioManager.explosionSound.play(0.2f);
+            }
+
+            if (hasToBeDestroyed) {
+                myGdxGame.world.destroyBody(UFO.body);
+                iteratorUFO.remove();
+            }
+
+            UFO.update();
         }
     }
 
@@ -251,6 +287,10 @@ public class GameScreen extends ScreenAdapter {
         for (int i = 0; i < trashArray.size(); i++) {
             myGdxGame.world.destroyBody(trashArray.get(i).body);
             trashArray.remove(i--);
+        }
+        for (int i = 0; i < UFOArray.size(); i++) {
+            myGdxGame.world.destroyBody(UFOArray.get(i).body);
+            UFOArray.remove(i--);
         }
 
         if (shipObject != null) {
