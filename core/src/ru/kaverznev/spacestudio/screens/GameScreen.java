@@ -16,7 +16,6 @@ import ru.kaverznev.spacestudio.objects.UFOObject;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Objects;
 
 public class GameScreen extends ScreenAdapter {
 
@@ -101,7 +100,6 @@ public class GameScreen extends ScreenAdapter {
                 GameResources.BUTTON_SHORT_BG_IMG_PATH,
                 "Home"
         );
-
     }
 
     @Override
@@ -128,6 +126,7 @@ public class GameScreen extends ScreenAdapter {
                 );
                 trashArray.add(trashObject);
                 UFOArray.add(ufoObject);
+                shipObject.giveSpeed(gameSession.getScore());
             }
 
             if (shipObject.needToShoot()) {

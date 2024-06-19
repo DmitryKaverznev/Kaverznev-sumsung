@@ -81,4 +81,10 @@ public class GameObject {
         return body;
     }
 
+    public void setTexturePath(String texturePath) {
+        //if (this.texture != null) {
+            this.texture.dispose();
+        //}
+        this.texture = new Texture(texturePath);
+    }
 }
